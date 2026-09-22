@@ -1,0 +1,95 @@
+{
+  "protocolVersion": "2024-11-05",
+  "serverInfo": {
+    "name": "automated-api-doc-mcp-server",
+    "version": "1.0.0",
+    "description": "Model Context Protocol (MCP) Server exposing automated API documentation and auditing capabilities."
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "parse_code_endpoints",
+      "description": "Parses Python (FastAPI/Flask/Django) or Node.js (Express) code to extract REST endpoints, parameters, and models.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Source code containing API endpoints"
+          },
+          "framework": {
+            "type": "string",
+            "enum": ["auto", "fastapi", "flask", "django", "express"],
+            "default": "auto",
+            "description": "Backend framework used in the code"
+          }
+        },
+        "required": ["code"]
+      }
+    },
+    {
+      "name": "generate_openapi_spec",
+      "description": "Synthesizes an OpenAPI 3.1.0 specification dictionary from parsed API endpoints.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endpoints": {
+            "type": "array",
+            "description": "List of parsed endpoint dictionaries"
+          },
+          "title": {
+            "type": "string",
+            "default": "REST API",
+            "description": "Title of the API"
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0",
+            "description": "API Version string"
+          }
+        },
+        "required": ["endpoints"]
+      }
+    },
+    {
+      "name": "audit_api_security",
+      "description": "Performs an OWASP API Security Top 10 audit and returns compliance scores and recommendations.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endpoints": {
+            "type": "array",
+            "description": "List of endpoint dictionaries to audit"
+          }
+        },
+        "required": ["endpoints"]
+      }
+    },
+    {
+      "name": "synthesize_documentation",
+      "description": "Runs the complete multi-agent workflow to produce Markdown, OpenAPI JSON, and Postman Collection artifacts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Raw source code"
+          },
+          "title": {
+            "type": "string",
+            "default": "API Documentation"
+          },
+          "framework": {
+            "type": "string",
+            "default": "auto"
+          }
+        },
+        "required": ["code"]
+      }
+    }
+  ]
+}

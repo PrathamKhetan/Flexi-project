@@ -1,0 +1,108 @@
+{
+  "name": "Automated API Documentation Assistant Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "api-doc-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "GitHub Push Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "node-webhook-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8080/mcp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tool\": \"synthesize_documentation\",\n  \"args\": {\n    \"code\": $json[\"body\"][\"head_commit\"][\"modified_code\"] || \"\",\n    \"title\": $json[\"body\"][\"repository\"][\"name\"] || \"Service API\",\n    \"framework\": \"auto\"\n  }\n}",
+        "options": {}
+      },
+      "name": "Call Agentic Doc Assistant",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [320, 300],
+      "id": "node-agent-call"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Structured Output Parsing (Unit 5 Syllabus Requirement)\nconst response = $input.item.json.result || {};\nconst openapi = response.openapi_spec || {};\nconst qualityScore = response.quality_score || 0;\nconst endpointsCount = Object.keys(openapi.paths || {}).length;\n\nreturn [{\n  json: {\n    api_title: openapi.info?.title || 'API',\n    version: openapi.info?.version || '1.0.0',\n    endpoints_count: endpointsCount,\n    quality_score: qualityScore,\n    status: qualityScore >= 80 ? 'APPROVED' : 'NEEDS_REVIEW',\n    generated_at: new Date().toISOString(),\n    markdown_doc: response.markdown_doc\n  }\n}];"
+      },
+      "name": "Structured Output Parser",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [540, 300],
+      "id": "node-json-parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "13zbVmjFY0nBXjvX3qJTjWd5dThBpfUBj",
+        "range": "Documentation_Logs!A:G",
+        "options": {}
+      },
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [760, 200],
+      "id": "node-google-sheets"
+    },
+    {
+      "parameters": {
+        "sendTo": "engineering-leads@university.edu",
+        "subject": "=API Docs Generated: {{ $json.api_title }} (Score: {{ $json.quality_score }}%)",
+        "message": "=Automated API Documentation Assistant has updated the specifications for {{ $json.api_title }}.\n\nEndpoints Documented: {{ $json.endpoints_count }}\nQuality & Security Score: {{ $json.quality_score }}%\nStatus: {{ $json.status }}\nGenerated At: {{ $json.generated_at }}",
+        "options": {}
+      },
+      "name": "Send Gmail Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [760, 420],
+      "id": "node-gmail"
+    }
+  ],
+  "connections": {
+    "GitHub Push Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call Agentic Doc Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Agentic Doc Assistant": {
+      "main": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Gmail Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
