@@ -10,17 +10,29 @@ from pathlib import Path
 # Base Paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
-DATA_DIR = PROJECT_ROOT / "data"
 SAMPLES_DIR = PROJECT_ROOT / "samples"
 DOCS_DIR = PROJECT_ROOT / "docs"
 WEB_DIR = PROJECT_ROOT / "web"
 
-# Ensure runtime directories exist
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
-DOCS_DIR.mkdir(parents=True, exist_ok=True)
+# Database & Runtime Data Settings (Unit 1: SQLite Persistent Memory)
+# In serverless environments (Vercel, AWS Lambda), filesystem is read-only except /tmp
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    DATA_DIR = Path("/tmp/flexi_data")
+else:
+    DATA_DIR = PROJECT_ROOT / "data"
 
-# Database Settings (Unit 1: SQLite Persistent Memory)
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    DATA_DIR = Path("/tmp/flexi_data")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+try:
+    SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+    DOCS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
+
 SQLITE_DB_PATH = DATA_DIR / "agent_memory.db"
 
 # LLM Providers Configuration (Unit 3: Multi-Model AI Agents)

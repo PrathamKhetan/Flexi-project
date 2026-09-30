@@ -4,7 +4,8 @@ Syllabus Alignment: Unit 4 (Components of MCP, Build and expose tool as an MCP s
 """
 
 import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import os
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any, Dict
 from ..tools.ast_parser_tool import ASTParserTool
@@ -136,13 +137,13 @@ class MCPHandler(BaseHTTPRequestHandler):
 class MCPServer:
     """Manages the lifecycle of the Model Context Protocol Server."""
 
-    def __init__(self, host: str = "127.0.0.1", port: int = 8080):
+    def __init__(self, host: str = "0.0.0.0", port: int = None):
         self.host = host
-        self.port = port
+        self.port = port if port is not None else int(os.environ.get("PORT", 8080))
         self.httpd = None
 
     def start(self):
-        self.httpd = HTTPServer((self.host, self.port), MCPHandler)
+        self.httpd = ThreadingHTTPServer((self.host, self.port), MCPHandler)
         print(f"[MCP Server] Running at http://{self.host}:{self.port}")
         try:
             self.httpd.serve_forever()
@@ -156,5 +157,5 @@ class MCPServer:
 
 
 if __name__ == "__main__":
-    server = MCPServer(port=8080)
+    server = MCPServer()
     server.start()

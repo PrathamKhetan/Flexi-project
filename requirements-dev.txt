@@ -1,0 +1,6 @@
+# Development, Testing, and Academic Document Compilation Dependencies
+-r requirements.txt
+gradio>=4.20.0
+python-docx>=1.1.0
+pymupdf>=1.24.0
+pytest>=8.0.0

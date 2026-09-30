@@ -1,15 +1,7 @@
-# Automated API Documentation Assistant Dependencies
-# Core standard libraries used: sqlite3, ast, json, http.server, urllib, re, typing
+# Automated API Documentation Assistant - Production Dependencies
+# Core standard libraries: sqlite3, ast, json, http.server, urllib, re, typing
 
-# Optional Enhanced Libraries
 pydantic>=2.0.0
-fastapi>=0.110.0
 requests>=2.31.0
-gradio>=4.20.0
-
-# Document & Presentation Compilation
-python-docx>=1.1.0
-pymupdf>=1.24.0
-
-# Development & Testing
-pytest>=8.0.0
+fastapi>=0.110.0
+uvicorn>=0.28.0

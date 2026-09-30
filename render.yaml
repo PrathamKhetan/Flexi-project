@@ -1,0 +1,22 @@
+# Render Blueprint Specification for Automated API Documentation Assistant
+# Deploy directly at: https://render.com/deploy
+version: "1"
+
+services:
+  - type: web
+    name: automated-api-doc-assistant
+    runtime: python
+    plan: free
+    region: oregon # or frankfurt / singapore / ohio
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 web/server.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AGENT_MODE
+        value: auto
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

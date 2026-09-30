@@ -192,6 +192,30 @@ All 11 unit and integration tests validate:
 
 ---
 
+## ☁️ Cloud Deployment (Vercel & Render)
+
+This project supports both serverless cloud deployment on **Vercel** and containerized web service deployment on **Render**.
+
+### Option A: Deploy on Vercel (Serverless FastAPI)
+1. Push your repository to GitHub.
+2. In the [Vercel Dashboard](https://vercel.com/dashboard), click **Add New...** > **Project** and import your repository.
+3. Vercel automatically detects the FastAPI preset via the top-level `app` in [`app.py`](app.py).
+4. *(Optional)* Add Environment Variables under **Settings > Environment Variables**:
+   - `OPENAI_API_KEY`: *(Optional, for GPT-4o)*
+   - `GEMINI_API_KEY`: *(Optional, for Gemini 1.5 Pro)*
+   - `AGENT_MODE`: `auto`
+5. Click **Deploy**. Vercel will install `requirements.txt` and launch the FastAPI serverless application with the Web Studio UI at `/`.
+
+### Option B: Deploy on Render (Web Service)
+1. In the [Render Dashboard](https://dashboard.render.com/), choose **New +** > **Blueprint** and connect your repository (uses [`render.yaml`](render.yaml)).
+2. Or create a manual Web Service with:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT` *(or `python3 web/server.py`)*
+   - **Health Check Path**: `/healthz`
+3. Click **Create Web Service**.
+
+---
+
 ## 📦 Project Deliverables & Submission Files
 
 1. **Academic Project Report**:

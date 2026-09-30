@@ -6,9 +6,10 @@ Syllabus Alignment: Unit 3 (Connect to UI, Visualize Agentic workflow) & Unit 4 
 import json
 import os
 import sys
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
+from typing import Any
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -37,6 +38,8 @@ class StudioServerHandler(SimpleHTTPRequestHandler):
 
         if path == "/":
             self._serve_file(STATIC_DIR / "index.html", "text/html")
+        elif path in ("/health", "/healthz"):
+            self._send_json({"status": "healthy", "service": "Automated API Documentation Assistant"})
         elif path.startswith("/static/"):
             filename = path.replace("/static/", "")
             file_path = STATIC_DIR / filename
@@ -149,11 +152,13 @@ class StudioServerHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
 
-def run_studio_server(port: int = 7860):
-    server = HTTPServer(("0.0.0.0", port), StudioServerHandler)
+def run_studio_server(port: int = None, host: str = "0.0.0.0"):
+    if port is None:
+        port = int(os.environ.get("PORT", 7860))
+    server = ThreadingHTTPServer((host, port), StudioServerHandler)
     print(f"\n========================================================")
     print(f"⚡ Automated API Documentation Assistant - Web Studio")
-    print(f"👉 Local URL: http://127.0.0.1:{port}")
+    print(f"👉 Running on: http://{host}:{port}")
     print(f"========================================================\n")
     try:
         server.serve_forever()
