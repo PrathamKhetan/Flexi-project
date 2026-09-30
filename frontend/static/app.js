@@ -1,5 +1,12 @@
 // Automated API Documentation Assistant - Frontend Application Logic
 
+// Resolve Backend API Base URL
+const API_BASE = (typeof window !== "undefined" && window.API_BASE_URL)
+  ? window.API_BASE_URL.replace(/\/$/, "")
+  : (typeof window !== "undefined" && (window.location.port === "7860" || window.location.hostname.includes("flexi-project-zpvj.onrender.com"))
+      ? ""
+      : "https://flexi-project-zpvj.onrender.com");
+
 let currentArtifacts = {
   markdown: "",
   openapi: null,
@@ -85,7 +92,7 @@ function switchTab(tabId) {
 // Load Pre-configured sample codebases
 async function loadSample(type) {
   try {
-    const res = await fetch(`/api/sample?name=${type}`);
+    const res = await fetch(`${API_BASE}/api/sample?name=${type}`);
     const data = await res.json();
     document.getElementById("codeInput").value = data.code;
     document.getElementById("apiTitle").value = data.title;
@@ -115,7 +122,7 @@ async function runGeneration() {
   document.getElementById("workflowStatus").style.color = "#f59e0b";
 
   try {
-    const res = await fetch("/api/generate", {
+    const res = await fetch(`${API_BASE}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -253,7 +260,7 @@ function renderTraces(logs, totalMs) {
 // Fetch SQLite Sessions (Unit 1)
 async function fetchSessions() {
   try {
-    const res = await fetch("/api/sessions");
+    const res = await fetch(`${API_BASE}/api/sessions`);
     const data = await res.json();
     const container = document.getElementById("memorySessionsView");
     const sessions = data.sessions || [];
@@ -295,7 +302,7 @@ async function runMLAnalytics() {
   const container = document.getElementById("mlAnalyticsView");
   container.innerHTML = "<p style='color:#94a3b8;'>Training regression model and computing metrics...</p>";
   try {
-    const res = await fetch("/api/ml_analytics");
+    const res = await fetch(`${API_BASE}/api/ml_analytics`);
     const data = await res.json();
 
     container.innerHTML = `
