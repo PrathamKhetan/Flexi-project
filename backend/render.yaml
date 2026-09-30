@@ -16,7 +16,7 @@ services:
         value: 3.11.9
       - key: AGENT_MODE
         value: auto
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
       - key: GEMINI_API_KEY
         sync: false

@@ -1,6 +1,6 @@
 """
 System Configuration for Automated API Documentation Assistant.
-Handles paths, environment settings, multi-model LLM configurations (OpenAI / Gemini),
+Handles paths, environment settings, multi-model LLM configurations (Groq / Gemini),
 and SQLite database settings.
 """
 
@@ -36,13 +36,13 @@ except OSError:
 SQLITE_DB_PATH = DATA_DIR / "agent_memory.db"
 
 # LLM Providers Configuration (Unit 3: Multi-Model AI Agents)
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-DEFAULT_OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
+DEFAULT_GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-pro")
 
-# Execution Mode: 'gemini', 'openai', 'auto', or 'local_heuristic'
+# Execution Mode: 'groq', 'gemini', 'auto', or 'local_heuristic'
 # In local_heuristic mode, an intelligent AST-grounded engine generates 100% compliant docs
 # without needing API tokens or network access.
 AGENT_EXECUTION_MODE = os.environ.get("AGENT_MODE", "auto")

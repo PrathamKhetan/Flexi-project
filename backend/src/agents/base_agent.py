@@ -1,5 +1,5 @@
 """
-Base Agent Architecture supporting Multi-Model Providers (OpenAI GPT-4o, Google Gemini, and Local Engine).
+Base Agent Architecture supporting Multi-Model Providers (Groq, Google Gemini, and Local Engine).
 Syllabus Alignment: Unit 2 (AI Agent Team Structure, Agent-as-Tool) & Unit 3 (Multi-Model AI Agents).
 """
 
@@ -9,7 +9,7 @@ import time
 import urllib.request
 import urllib.parse
 from typing import Any, Callable, Dict, List, Optional
-from ..config import OPENAI_API_KEY, GEMINI_API_KEY, DEFAULT_OPENAI_MODEL, DEFAULT_GEMINI_MODEL
+from ..config import GROQ_API_KEY, GEMINI_API_KEY, DEFAULT_GROQ_MODEL, DEFAULT_GEMINI_MODEL
 
 
 class BaseAgent:
@@ -38,37 +38,38 @@ class BaseAgent:
     def call_llm(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """
         Calls the configured LLM provider.
-        Supports OpenAI (GPT-4o), Google Gemini, with automatic fallback.
+        Supports Groq (llama-3.3-70b), Google Gemini, with automatic fallback.
         """
         sys_instruction = system_prompt or f"You are {self.name}, the {self.role}. Goal: {self.goal}. Background: {self.backstory}"
 
-        # 1. Try Gemini if configured or requested
+        # 1. Try Groq if configured or requested
+        if (self.model_provider in ("groq", "auto")) and GROQ_API_KEY:
+            try:
+                return self._call_groq(prompt, sys_instruction)
+            except Exception:
+                if self.model_provider == "groq":
+                    raise
+
+        # 2. Try Gemini if configured or requested
         if (self.model_provider in ("gemini", "auto")) and GEMINI_API_KEY:
             try:
                 return self._call_gemini(prompt, sys_instruction)
-            except Exception as e:
+            except Exception:
                 if self.model_provider == "gemini":
-                    raise
-
-        # 2. Try OpenAI if configured or requested
-        if (self.model_provider in ("openai", "auto")) and OPENAI_API_KEY:
-            try:
-                return self._call_openai(prompt, sys_instruction)
-            except Exception as e:
-                if self.model_provider == "openai":
                     raise
 
         # 3. Fallback to Local Engine
         return self._local_engine_fallback(prompt)
 
-    def _call_openai(self, prompt: str, system_prompt: str) -> str:
-        url = "https://api.openai.com/v1/chat/completions"
+    def _call_groq(self, prompt: str, system_prompt: str) -> str:
+        """Calls Groq API — OpenAI-compatible endpoint for fast inference."""
+        url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {OPENAI_API_KEY}"
+            "Authorization": f"Bearer {GROQ_API_KEY}"
         }
         data = {
-            "model": DEFAULT_OPENAI_MODEL,
+            "model": DEFAULT_GROQ_MODEL,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}

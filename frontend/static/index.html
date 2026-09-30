@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automated API Documentation Assistant | Agentic AI & Automation</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="top-header">
+      <div class="brand">
+        <div class="brand-logo">⚡</div>
+        <div class="brand-text">
+          <h1>Automated API Documentation Assistant</h1>
+          <span class="sub-badge">Symbiosis International University • Agentic AI & Automation (CA3 Mini Project)</span>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">LangGraph Multi-Agent</span>
+        <span class="badge badge-success">SQLite Memory</span>
+        <span class="badge badge-warning">MCP Protocol</span>
+        <span class="badge badge-info">OpenAPI 3.1</span>
+        <span class="badge badge-purple">n8n Pipeline</span>
+      </div>
+    </header>
+
+    <!-- Visual Agent Workflow Graph Bar -->
+    <section class="workflow-graph-section">
+      <div class="section-title-row">
+        <h3>🧭 Active LangGraph Agentic Workflow Graph</h3>
+        <span class="status-indicator" id="workflowStatus">Ready</span>
+      </div>
+      <div class="graph-canvas" id="graphCanvas">
+        <!-- SVG rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Main Workspace (Split Grid) -->
+    <main class="main-grid">
+      <!-- Left Column: Code Input & Configuration -->
+      <section class="panel left-panel">
+        <div class="panel-header">
+          <h3>💻 Source Code Input</h3>
+          <div class="sample-buttons">
+            <button class="btn btn-sm" onclick="loadSample('fastapi')">FastAPI</button>
+            <button class="btn btn-sm" onclick="loadSample('flask')">Flask</button>
+            <button class="btn btn-sm" onclick="loadSample('express')">Express</button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <div class="form-group">
+            <label for="apiTitle">API Service Name</label>
+            <input type="text" id="apiTitle" value="CloudCommerce API" placeholder="e.g. Payment Gateway" />
+          </div>
+          <div class="form-group">
+            <label for="frameworkSelect">Framework</label>
+            <select id="frameworkSelect">
+              <option value="auto">Auto-Detect</option>
+              <option value="fastapi">FastAPI (Python)</option>
+              <option value="flask">Flask (Python)</option>
+              <option value="express">Express.js (Node)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <div class="form-group">
+            <label for="modelSelect">AI Model Engine</label>
+            <select id="modelSelect">
+              <option value="auto">Adaptive Multi-Model (Auto)</option>
+              <option value="openai">OpenAI (GPT-4o)</option>
+              <option value="gemini">Google Gemini (1.5 Pro)</option>
+              <option value="local">Deterministic Local AST Engine</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="apiVersion">API Version</label>
+            <input type="text" id="apiVersion" value="1.0.0" />
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <textarea id="codeInput" spellcheck="false" placeholder="Paste FastAPI, Flask, or Express.js route definitions here..."></textarea>
+        </div>
+
+        <div class="action-footer">
+          <button class="btn btn-primary btn-block" id="btnGenerate" onclick="runGeneration()">
+            <span class="btn-icon">✨</span> Generate Documentation via Agent Team
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Column: Outputs, Live Logs, and Tabs -->
+      <section class="panel right-panel">
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab('markdownTab')">📖 Dev Portal Docs</button>
+          <button class="tab-btn" onclick="switchTab('swaggerTab')">🌐 OpenAPI Spec (JSON)</button>
+          <button class="tab-btn" onclick="switchTab('securityTab')">🛡️ OWASP Audit</button>
+          <button class="tab-btn" onclick="switchTab('tracesTab')">🔍 Agent Trace Log</button>
+          <button class="tab-btn" onclick="switchTab('postmanTab')">📦 Postman v2.1</button>
+          <button class="tab-btn" onclick="switchTab('mlTab')">📊 Classical ML (Unit 4)</button>
+          <button class="tab-btn" onclick="switchTab('memoryTab')">🗄️ SQLite Memory</button>
+        </div>
+
+        <!-- Tab 1: Markdown Documentation -->
+        <div class="tab-content active" id="markdownTab">
+          <div class="content-toolbar">
+            <span class="content-meta" id="docStats">Ready to generate.</span>
+            <button class="btn btn-sm btn-outline" onclick="downloadArtifact('markdown')">⬇️ Download Markdown</button>
+          </div>
+          <div class="markdown-preview" id="markdownView">
+            <div class="empty-state">
+              <div class="empty-icon">📘</div>
+              <h4>No documentation generated yet</h4>
+              <p>Paste or load an API code snippet on the left and click "Generate Documentation via Agent Team".</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: OpenAPI JSON -->
+        <div class="tab-content" id="swaggerTab">
+          <div class="content-toolbar">
+            <span class="content-meta">OpenAPI 3.1.0 Specification Schema</span>
+            <button class="btn btn-sm btn-outline" onclick="downloadArtifact('openapi')">⬇️ Download openapi.json</button>
+          </div>
+          <pre class="code-viewer"><code id="openapiJsonView">// OpenAPI 3.1.0 JSON will appear here...</code></pre>
+        </div>
+
+        <!-- Tab 3: Security & Guardrail Audit -->
+        <div class="tab-content" id="securityTab">
+          <div class="content-toolbar">
+            <span class="content-meta">OWASP API Security Top 10 Audit & Guardrails</span>
+          </div>
+          <div class="security-dashboard" id="securityView">
+            <div class="empty-state">
+              <div class="empty-icon">🛡️</div>
+              <h4>Security Audit Pending</h4>
+              <p>The QualityAuditorAgent will inspect endpoints for authorization leaks, injection vectors, and missing pagination.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Agent Execution Traces -->
+        <div class="tab-content" id="tracesTab">
+          <div class="content-toolbar">
+            <span class="content-meta">Step-by-Step Multi-Agent Execution & Handoff Logs</span>
+          </div>
+          <div class="trace-feed" id="traceLogView">
+            <div class="empty-state">
+              <div class="empty-icon">⚡</div>
+              <h4>No active run traces</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Postman Collection -->
+        <div class="tab-content" id="postmanTab">
+          <div class="content-toolbar">
+            <span class="content-meta">Postman Collection v2.1.0 JSON</span>
+            <button class="btn btn-sm btn-outline" onclick="downloadArtifact('postman')">⬇️ Download postman_collection.json</button>
+          </div>
+          <pre class="code-viewer"><code id="postmanJsonView">// Postman collection will appear here...</code></pre>
+        </div>
+
+        <!-- Tab 6: Classical ML Predictive Analytics (Unit 4) -->
+        <div class="tab-content" id="mlTab">
+          <div class="content-toolbar">
+            <span class="content-meta">Unit 4: Classical ML Regression & Evaluation Metrics (R², MAE, MSE)</span>
+            <button class="btn btn-sm btn-primary" onclick="runMLAnalytics()">🚀 Retrain & Evaluate Model</button>
+          </div>
+          <div class="ml-analytics-view" id="mlAnalyticsView">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Tab 7: SQLite Memory & Persistent Sessions -->
+        <div class="tab-content" id="memoryTab">
+          <div class="content-toolbar">
+            <span class="content-meta">Unit 1: SQLite Persistent Memory Sessions & Artifact History</span>
+            <button class="btn btn-sm btn-outline" onclick="fetchSessions()">🔄 Refresh Sessions</button>
+          </div>
+          <div class="memory-viewer" id="memorySessionsView">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
